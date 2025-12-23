@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>WAEC Maths Practice | ExamBuddy</title>
+  <title>Practice | ExamBuddy</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="style.css">
   <style>
     .practice-box {
       background: white;
@@ -24,9 +24,7 @@
       cursor: pointer;
     }
 
-    .options input {
-      margin-right: 8px;
-    }
+    .options input { margin-right: 8px; }
 
     .result {
       margin-top: 15px;
@@ -57,14 +55,14 @@
 <body>
 
   <header class="navbar">
-    <h1 class="logo">ExamBuddy</h1>
+    <h1 class="logo">ExamBuddy 📘</h1>
     <nav>
-      <a href="index.html">Home</a>
+      <a href="subjects.html">Back</a>
     </nav>
   </header>
 
   <div class="practice-box">
-    <h2>WAEC Mathematics Practice</h2>
+    <h2 id="subject-title">Practice ✏️</h2>
 
     <div id="question-container"></div>
 
@@ -76,8 +74,8 @@
   </div>
 
   <script>
-    // 15-question pool
-    const allQuestions = [
+    // Question pools
+    const mathQuestions = [
       {q:"Simplify: 2x + 5x", options:["7x","10x","5x","7"], answer:"7x", explanation:"2+5=7 → 7x"},
       {q:"If x=3, what is 4x+2?", options:["14","12","11","10"], answer:"14", explanation:"4*3+2=14"},
       {q:"What is the square of 5?", options:["10","15","20","25"], answer:"25", explanation:"5*5=25"},
@@ -87,12 +85,20 @@
       {q:"If x=2, compute x^2 + 3", options:["5","7","8","9"], answer:"7", explanation:"2^2 +3=7"},
       {q:"What is 12 × 3?", options:["36","24","30","32"], answer:"36", explanation:"12*3=36"},
       {q:"Simplify: 5(a+4)", options:["5a+4","5a+20","a+9","20a"], answer:"5a+20", explanation:"Distribute 5 → 5a+20"},
-      {q:"What is 9 ÷ 3?", options:["2","3","4","5"], answer:"3", explanation:"9÷3=3"},
-      {q:"Simplify: 7x + 3x - 4x", options:["6x","10x","0","4x"], answer:"6x", explanation:"7+3-4=6 → 6x"},
-      {q:"If y=5, compute 2y+10", options:["20","15","10","25"], answer:"20", explanation:"2*5+10=20"},
-      {q:"Simplify: 8m - 3m + 2m", options:["7m","5m","10m","3m"], answer:"7m", explanation:"8-3+2=7 → 7m"},
-      {q:"What is 6 × 7?", options:["42","36","48","40"], answer:"42", explanation:"6*7=42"},
-      {q:"If x=4, compute x^2 - 3", options:["13","16","7","10"], answer:"13", explanation:"4^2-3=13"}
+      {q:"What is 9 ÷ 3?", options:["2","3","4","5"], answer:"3", explanation:"9÷3=3"}
+    ];
+
+    const physicsQuestions = [
+      {q:"What is the SI unit of force?", options:["Newton","Joule","Watt","Pascal"], answer:"Newton", explanation:"Force = mass × acceleration, unit is Newton (N)"},
+      {q:"What is the acceleration due to gravity on Earth?", options:["9.8 m/s²","10 m/s²","9.8 km/s²","8 m/s²"], answer:"9.8 m/s²", explanation:"Standard gravity g ≈ 9.8 m/s²"},
+      {q:"Which device is used to measure current?", options:["Voltmeter","Ammeter","Ohmmeter","Galvanometer"], answer:"Ammeter", explanation:"Ammeter measures electric current in amperes"},
+      {q:"What is the speed of light in vacuum?", options:["3×10^8 m/s","3×10^6 m/s","3×10^5 km/s","3×10^7 m/s"], answer:"3×10^8 m/s", explanation:"Speed of light c = 3×10^8 meters/second"},
+      {q:"Which law states F=ma?", options:["Ohm's Law","Newton's Second Law","Newton's First Law","Hooke's Law"], answer:"Newton's Second Law", explanation:"Newton's Second Law: Force = mass × acceleration"},
+      {q:"Energy stored in a stretched spring is?", options:["Kinetic Energy","Potential Energy","Elastic Potential Energy","Mechanical Energy"], answer:"Elastic Potential Energy", explanation:"E = 1/2 k x²"},
+      {q:"Unit of electric charge is?", options:["Coulomb","Ampere","Volt","Ohm"], answer:"Coulomb", explanation:"Electric charge is measured in Coulombs (C)"},
+      {q:"What is 1 Joule?", options:["1 N·m","1 kg","1 W","1 V"], answer:"1 N·m", explanation:"1 Joule = 1 Newton × 1 meter of displacement"},
+      {q:"Which instrument measures temperature?", options:["Thermometer","Barometer","Hygrometer","Ammeter"], answer:"Thermometer", explanation:"Thermometer measures temperature in °C or K"},
+      {q:"What is the formula for speed?", options:["v = d/t","v = m×a","v = F/m","v = m/g"], answer:"v = d/t", explanation:"Speed = distance ÷ time"}
     ];
 
     // Shuffle function
@@ -104,8 +110,18 @@
       return array;
     }
 
-    // Pick 5 random questions
-    let questionPool = shuffleArray([...allQuestions]).slice(0,5);
+    // Get subject from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const subject = urlParams.get('subject') || "Math";
+    document.getElementById("subject-title").textContent = subject + " Practice ✏️";
+
+    // Pick question pool based on subject
+    let questionPool = [];
+    if(subject === "Math"){
+      questionPool = shuffleArray([...mathQuestions]).slice(0,5);
+    } else if(subject === "Physics"){
+      questionPool = shuffleArray([...physicsQuestions]).slice(0,5);
+    }
 
     let currentQuestion = 0;
     let userAnswers = new Array(questionPool.length).fill(null);
