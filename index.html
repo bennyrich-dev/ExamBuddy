@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WAEC Maths Practice | ExamBuddy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./style.css">
+  <style>
+    .practice-box {
+      background: white;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .options label {
+      display: block;
+      padding: 10px;
+      margin-bottom: 8px;
+      background: #f1f5ff;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .options input {
+      margin-right: 8px;
+    }
+
+    .result {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    .explanation {
+      margin-top: 10px;
+      padding: 12px;
+      background: #eef2ff;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #4f46e5;
+      color: white;
+      border-radius: 30px;
+      font-weight: bold;
+      text-decoration: none;
+      margin-top: 10px;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="navbar">
+    <h1 class="logo">ExamBuddy </h1>
+    <nav>
+      <a href="index.html">Home</a>
+    </nav>
+  </header>
+
+  <div class="practice-box">
+    <h2>WAEC Mathematics Practice </h2>
+
+    <div id="question-container"></div>
+
+    <button class="btn" id="prev-btn">Previous Question</button>
+    <button class="btn" id="next-btn">Next Question</button>
+
+    <div id="result" class="result"></div>
+    <div id="explanation" class="explanation"></div>
+  </div>
+
+  <script>
+    // 15-question pool
+    const allQuestions = [
+      {q:"Simplify: 2x + 5x", options:["7x","10x","5x","7"], answer:"7x", explanation:"2+5=7  7x"},
+      {q:"If x=3, what is 4x+2?", options:["14","12","11","10"], answer:"14", explanation:"4*3+2=14"},
+      {q:"What is the square of 5?", options:["10","15","20","25"], answer:"25", explanation:"5*5=25"},
+      {q:"Simplify: 3(a+2)", options:["3a+2","3a+6","a+5","5a+6"], answer:"3a+6", explanation:"Distribute 3  3a+6"},
+      {q:"What is 15 ÷ 3?", options:["3","4","5","6"], answer:"5", explanation:"15÷3=5"},
+      {q:"Simplify: 6y - 2y", options:["4y","8y","6y","2y"], answer:"4y", explanation:"6-2=4  4y"},
+      {q:"If x=2, compute x^2 + 3", options:["5","7","8","9"], answer:"7", explanation:"2^2 +3=7"},
+      {q:"What is 12 × 3?", options:["36","24","30","32"], answer:"36", explanation:"12*3=36"},
+      {q:"Simplify: 5(a+4)", options:["5a+4","5a+20","a+9","20a"], answer:"5a+20", explanation:"Distribute 5  5a+20"},
+      {q:"What is 9 ÷ 3?", options:["2","3","4","5"], answer:"3", explanation:"9÷3=3"},
+      {q:"Simplify: 7x + 3x - 4x", options:["6x","10x","0","4x"], answer:"6x", explanation:"7+3-4=6  6x"},
+      {q:"If y=5, compute 2y+10", options:["20","15","10","25"], answer:"20", explanation:"2*5+10=20"},
+      {q:"Simplify: 8m - 3m + 2m", options:["7m","5m","10m","3m"], answer:"7m", explanation:"8-3+2=7  7m"},
+      {q:"What is 6 × 7?", options:["42","36","48","40"], answer:"42", explanation:"6*7=42"},
+      {q:"If x=4, compute x^2 - 3", options:["13","16","7","10"], answer:"13", explanation:"4^2-3=13"}
+    ];
+
+    // Shuffle function
+    function shuffleArray(array) {
+      for (let i=array.length-1;i>0;i--){
+        const j=Math.floor(Math.random()*(i+1));
+        [array[i],array[j]]=[array[j],array[i]];
+      }
+      return array;
+    }
+
+    // Pick 5 random questions
+    let questionPool = shuffleArray([...allQuestions]).slice(0,5);
+
+    let currentQuestion = 0;
+    let userAnswers = new Array(questionPool.length).fill(null);
+    let answeredThisQuestion = false;
+
+    const container = document.getElementById("question-container");
+    const nextBtn = document.getElementById("next-btn");
+    const prevBtn = document.getElementById("prev-btn");
+    const resultDiv = document.getElementById("result");
+    const explanationDiv = document.getElementById("explanation");
+
+    function showQuestion() {
+      const q = questionPool[currentQuestion];
+      const optionsShuffled = shuffleArray([...q.options]);
+
+      let html = `<p><strong>Question ${currentQuestion+1}:</strong> ${q.q}</p>`;
+      html += '<div class="options">';
+      for (let i=0;i<optionsShuffled.length;i++){
+        const checked = userAnswers[currentQuestion]===optionsShuffled[i] ? "checked":"";
+        html += `<label><input type="radio" name="answer" value="${optionsShuffled[i]}" ${checked}> ${optionsShuffled[i]}</label>`;
+      }
+      html += '</div>';
+
+      container.innerHTML = html;
+      resultDiv.textContent = "";
+      explanationDiv.style.display = "none";
+      explanationDiv.textContent = "";
+      answeredThisQuestion = false;
+
+      prevBtn.style.display = currentQuestion===0?"none":"inline-block";
+      nextBtn.textContent = currentQuestion===questionPool.length-1?"Finish":"Next Question";
+    }
+
+    function saveAnswer(){
+      const options=document.getElementsByName("answer");
+      for(let opt of options){
+        if(opt.checked) userAnswers[currentQuestion]=opt.value;
+      }
+    }
+
+    function checkAnswer(){
+      saveAnswer();
+      const selected=userAnswers[currentQuestion];
+      if(!selected){
+        resultDiv.textContent="Please select an answer first ";
+        resultDiv.style.color="orange";
+        return false;
+      }
+
+      const correct=questionPool[currentQuestion].answer;
+      if(selected===correct){
+        resultDiv.textContent="Correct ";
+        resultDiv.style.color="green";
+      } else {
+        resultDiv.textContent="Wrong ";
+        resultDiv.style.color="red";
+      }
+
+      explanationDiv.style.display="block";
+      explanationDiv.innerHTML="Explanation: "+questionPool[currentQuestion].explanation;
+      return true;
+    }
+
+    nextBtn.addEventListener("click", ()=>{
+      if(!answeredThisQuestion){
+        answeredThisQuestion = checkAnswer();
+      } else {
+        currentQuestion++;
+        if(currentQuestion<questionPool.length){
+          showQuestion();
+        } else {
+          // Test finished
+          container.innerHTML=`<h3> Test Completed!</h3>`;
+          prevBtn.style.display="none";
+          nextBtn.style.display="none";
+
+          // Calculate score
+          let score=0;
+          for(let i=0;i<userAnswers.length;i++){
+            if(userAnswers[i]===questionPool[i].answer) score++;
+          }
+          resultDiv.textContent=`You got ${score}/${questionPool.length} correct `;
+          explanationDiv.style.display="none";
+        }
+      }
+    });
+
+    prevBtn.addEventListener("click", ()=>{
+      saveAnswer();
+      if(currentQuestion>0){
+        currentQuestion--;
+        showQuestion();
+      }
+    });
+
+    showQuestion();
+  </script>
+
+</body>
+</html>
